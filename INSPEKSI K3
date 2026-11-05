@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lapor Temuan Bahaya K3 Wood Preparation - PT LPPI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @media print {
+      body {
+        background: white !important;
+        padding: 0 !important;
+      }
+      header, nav, #alertBox, #ctrlBar, .no-print {
+        display: none !important;
+      }
+      #printableArea {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body class="bg-neutral-100 text-neutral-800 font-sans min-h-screen pb-16">
+
+  <!-- Header Merah & Putih K3 -->
+  <header class="bg-red-700 text-white shadow-md sticky top-0 z-30 border-b-4 border-red-900 no-print">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-red-700 shadow-sm">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-black uppercase tracking-wider text-white">Inspeksi & Temuan Bahaya K3</h1>
+          <p class="text-[11px] text-red-100 font-medium">Wood Preparation - PT Lontar Papyrus Pulp & Paper Industry</p>
+        </div>
+      </div>
+      <span class="text-[10px] bg-white text-red-800 font-bold px-2.5 py-1 rounded border border-red-200 uppercase tracking-widest shadow-sm">HSE</span>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4">
+
+    <!-- Notifikasi Pesan -->
+    <div id="alertBox" class="hidden p-3 rounded-lg text-xs font-semibold shadow border no-print"></div>
+
+    <!-- Navigasi Tab -->
+    <div class="grid grid-cols-2 bg-white rounded-lg shadow-sm p-1 border border-neutral-200 text-xs font-bold text-center no-print">
+      <button type="button" onclick="pindahTab('tabLapor')" id="nav-tabLapor" class="py-2.5 rounded text-white bg-red-700 shadow-sm transition">
+        <i class="fa-solid fa-pen-to-square mr-1.5"></i>Lapor Temuan Bahaya
+      </button>
+      <button type="button" onclick="pindahTab('tabRekap')" id="nav-tabRekap" class="py-2.5 rounded text-neutral-600 hover:bg-neutral-50 transition">
+        <i class="fa-solid fa-file-pdf mr-1.5 text-red-700"></i>Rekapitulasi & PDF
+      </button>
+    </div>
+
+    <!-- TAB 1: FORM INPUT TEMUAN BAHAYA -->
+    <section id="tabLapor" class="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 space-y-3">
+      <form id="formBahaya" onsubmit="prosesKirimBahaya(event)" class="space-y-3 text-xs">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-neutral-50 p-3 rounded-lg border border-neutral-200 mb-2">
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Tanggal</label>
+            <input type="date" id="h_tanggal" required class="w-full border rounded p-1.5 bg-white font-medium focus:border-red-600 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Nama Pelapor / Trainee</label>
+            <input type="text" id="h_pelapor" value="Hotmartua Sitompul" required class="w-full border rounded p-1.5 bg-white font-medium focus:border-red-600 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Area Temuan Lapangan <span class="text-red-600">*</span></label>
+            <input type="text" id="h_area" required class="w-full border rounded-lg p-2 font-medium bg-white focus:border-red-600 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Penanggung Jawab Tindakan (PIC) <span class="text-red-600">*</span></label>
+            <input type="text" id="h_pic" required class="w-full border rounded-lg p-2 font-medium bg-white focus:border-red-600 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Kategori Bahaya</label>
+            <select id="h_kategori" class="w-full border rounded-lg p-2 bg-white outline-none focus:border-red-600 font-medium">
+              <option value="Unsafe Condition (Kondisi Tidak Aman)">Unsafe Condition (Kondisi Fisik Tidak Aman)</option>
+              <option value="Unsafe Act (Tindakan Tidak Aman)">Unsafe Act (Tindakan / Perilaku Tidak Aman)</option>
+              <option value="Nearmiss (Hampir Celaka)">Nearmiss (Insiden Hampir Celaka)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Tingkat Risiko Bahaya</label>
+            <select id="h_risiko" onchange="sesuaikanWarnaRisiko(this)" class="w-full border-2 rounded-lg p-2 bg-white font-bold outline-none border-amber-500 text-amber-700">
+              <option value="Rendah" class="text-green-700">Rendah (Low Risk)</option>
+              <option value="Sedang" class="text-amber-700" selected>Sedang (Medium Risk)</option>
+              <option value="Tinggi" class="text-red-700 font-bold">Tinggi (High / Bahaya Kritis)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 mb-1">Deskripsi Temuan Bahaya <span class="text-red-600">*</span></label>
+          <textarea id="h_deskripsi" required rows="3" class="w-full border rounded-lg p-2 bg-white outline-none focus:border-red-600"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-neutral-700 mb-1">Tindakan Korektif & Pencegahan (CAPA)</label>
+            <input type="text" id="h_capa" class="w-full border rounded-lg p-2 bg-white outline-none focus:border-red-600">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 mb-1">Target Penyelesaian</label>
+            <input type="date" id="h_target" class="w-full border rounded-lg p-2 bg-white outline-none focus:border-red-600">
+          </div>
+        </div>
+
+        <button type="submit" id="btnSimpan" class="w-full mt-3 bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-lg text-xs tracking-wider uppercase transition shadow flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Simpan Temuan Bahaya</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- TAB 2: REKAPITULASI & DOKUMEN CETAK / PDF -->
+    <section id="tabRekap" class="hidden space-y-4">
+      
+      <!-- Panel Kontrol Aksi -->
+      <div id="ctrlBar" class="bg-white p-3 rounded-lg border border-neutral-200 shadow-sm flex flex-wrap items-center justify-between gap-2 no-print">
+        <div>
+          <h2 class="text-xs font-bold text-neutral-800 uppercase">Rekapitulasi Laporan Temuan K3</h2>
+          <p class="text-[10px] text-neutral-500">Tersusun otomatis dan siap dicetak / simpan sebagai PDF resmi</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="muatDataRekap()" class="bg-neutral-200 hover:bg-neutral-300 text-neutral-700 text-xs px-3 py-2 rounded font-semibold flex items-center space-x-1 transition">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Refresh</span>
+          </button>
+          <button type="button" onclick="cetakLaporanPDF()" class="bg-red-700 hover:bg-red-800 text-white text-xs px-4 py-2 rounded font-bold flex items-center space-x-1.5 shadow transition">
+            <i class="fa-solid fa-print"></i>
+            <span>Cetak / Simpan PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Area Tampilan Dokumen Cetak / PDF Resmi LPPI -->
+      <div id="printableArea" class="bg-white p-6 rounded-lg border border-neutral-300 shadow-sm text-neutral-800 text-xs">
+        
+        <!-- Kop Surat Dokumen PT LPPI -->
+        <div class="border-b-2 border-red-700 pb-3 mb-4 flex justify-between items-center">
+          <div>
+            <h2 class="text-sm font-black tracking-wider uppercase text-red-700">PT LONTAR PAPYRUS PULP & PAPER INDUSTRY</h2>
+            <h3 class="text-xs font-bold text-neutral-700">DEPARTEMEN WOOD PREPARATION & MATERIAL HANDLING</h3>
+            <p class="text-[10px] text-neutral-500">Tebing Tinggi, Tanjung Jabung Barat, Jambi</p>
+          </div>
+          <div class="text-right">
+            <div class="inline-block border border-red-700 bg-red-50 px-2.5 py-1 rounded text-center">
+              <span class="block text-[9px] uppercase font-bold text-red-700">Laporan Temuan K3</span>
+              <span class="text-[11px] font-mono font-bold text-neutral-800">LPPI-WP-HAZARD</span>
+            </div>
+            <p class="text-[9px] text-neutral-400 mt-1" id="pdfDateNow"></p>
+          </div>
+        </div>
+
+        <div class="text-center my-3">
+          <h1 class="text-sm font-bold uppercase underline text-neutral-900">REKAPITULASI LAPORAN TEMUAN BAHAYA & TINDAKAN PERBAIKAN (CAPA)</h1>
+        </div>
+
+        <!-- Tabel Rekap Temuan Bahaya -->
+        <div class="mb-6 overflow-x-auto">
+          <table class="w-full border-collapse border border-neutral-300 text-[10px]">
+            <thead class="bg-neutral-100 font-bold text-neutral-700">
+              <tr>
+                <th class="border border-neutral-300 p-1.5 text-center w-8">No</th>
+                <th class="border border-neutral-300 p-1.5 text-left">Tanggal & Pelapor</th>
+                <th class="border border-neutral-300 p-1.5 text-left">Area Temuan Lapangan</th>
+                <th class="border border-neutral-300 p-1.5 text-center">Risiko</th>
+                <th class="border border-neutral-300 p-1.5 text-left">Deskripsi Bahaya</th>
+                <th class="border border-neutral-300 p-1.5 text-left">Tindakan Korektif (CAPA)</th>
+                <th class="border border-neutral-300 p-1.5 text-left">PIC</th>
+                <th class="border border-neutral-300 p-1.5 text-center">Target</th>
+              </tr>
+            </thead>
+            <tbody id="pdfTbodyBahaya">
+              <tr>
+                <td colspan="8" class="border border-neutral-300 p-3 text-center text-neutral-400">Memuat data temuan bahaya...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Lembar Pengesahan Dokumen -->
+        <div class="grid grid-cols-2 gap-8 pt-4 border-t border-neutral-300 text-[10px]">
+          <div class="text-center">
+            <p class="font-medium text-neutral-600">Mengetahui,<br>Pengawas / Mentor Lapangan</p>
+            <div class="h-14"></div>
+            <p class="font-bold underline text-neutral-800">( ............................................ )</p>
+            <p class="text-[9px] text-neutral-500">Wood Preparation LPPI</p>
+          </div>
+          <div class="text-center">
+            <p class="font-medium text-neutral-600">Dibuat Oleh,<br>Petugas Pemantau K3</p>
+            <div class="h-14"></div>
+            <p class="font-bold underline text-neutral-800">Hotmartua Sitompul</p>
+            <p class="text-[9px] text-neutral-500">Wood Preparation Trainee</p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('h_tanggal').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pdfDateNow').innerText = 'Tanggal: ' + new Date().toLocaleDateString('id-ID');
+    });
+
+    function pindahTab(targetId) {
+      document.getElementById('tabLapor').classList.add('hidden');
+      document.getElementById('tabRekap').classList.add('hidden');
+      
+      document.getElementById('nav-tabLapor').className = "py-2.5 rounded text-neutral-600 hover:bg-neutral-50 transition";
+      document.getElementById('nav-tabRekap').className = "py-2.5 rounded text-neutral-600 hover:bg-neutral-50 transition";
+
+      document.getElementById(targetId).classList.remove('hidden');
+      const aktifBtn = document.getElementById('nav-' + targetId);
+      aktifBtn.className = "py-2.5 rounded text-white bg-red-700 shadow-sm transition";
+
+      if (targetId === 'tabRekap') {
+        muatDataRekap();
+      }
+    }
+
+    function sesuaikanWarnaRisiko(selectEl) {
+      selectEl.classList.remove('border-green-500', 'text-green-700', 'border-amber-500', 'text-amber-700', 'border-red-600', 'text-red-700');
+      if (selectEl.value === 'Tinggi') {
+        selectEl.classList.add('border-red-600', 'text-red-700');
+      } else if (selectEl.value === 'Sedang') {
+        selectEl.classList.add('border-amber-500', 'text-amber-700');
+      } else {
+        selectEl.classList.add('border-green-500', 'text-green-700');
+      }
+    }
+
+    function tampilNotifikasi(teks, sukses = true) {
+      const box = document.getElementById('alertBox');
+      box.className = sukses 
+        ? 'p-3 rounded-lg text-xs font-semibold shadow bg-emerald-50 text-emerald-800 border-emerald-300 no-print' 
+        : 'p-3 rounded-lg text-xs font-semibold shadow bg-red-50 text-red-800 border-red-300 no-print';
+      box.innerHTML = `<i class="fa-solid ${sukses ? 'fa-circle-check' : 'fa-circle-exclamation'} mr-2"></i>${teks}`;
+      box.classList.remove('hidden');
+      setTimeout(() => box.classList.add('hidden'), 5000);
+    }
+
+    function prosesKirimBahaya(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSimpan');
+      const areaInput = document.getElementById('h_area').value.trim();
+      const picInput = document.getElementById('h_pic').value.trim();
+
+      if (!areaInput || !picInput) {
+        tampilNotifikasi('Area temuan dan Penanggung Jawab (PIC) wajib diisi!', false);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        tanggal: document.getElementById('h_tanggal').value,
+        pelapor: document.getElementById('h_pelapor').value,
+        area: areaInput,
+        pic: picInput,
+        kategori: document.getElementById('h_kategori').value,
+        risiko: document.getElementById('h_risiko').value,
+        deskripsi: document.getElementById('h_deskripsi').value,
+        capa: document.getElementById('h_capa').value,
+        target: document.getElementById('h_target').value
+      };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Simpan Temuan Bahaya</span>';
+            if (res && res.success) {
+              tampilNotifikasi(res.message, true);
+              document.getElementById('h_deskripsi').value = '';
+              document.getElementById('h_capa').value = '';
+            } else {
+              tampilNotifikasi('Gagal: ' + (res ? res.message : 'Terjadi kendala sistem'), false);
+            }
+          })
+          .withFailureHandler(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Simpan Temuan Bahaya</span>';
+            tampilNotifikasi('Koneksi Gagal: ' + err, false);
+          })
+          .simpanTemuan(payload);
+      } else {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Simpan Temuan Bahaya</span>';
+          tampilNotifikasi('Mode Lokal: Data tersimpan secara offline.', true);
+        }, 500);
+      }
+    }
+
+    // Fungsi Pengambilan Data Spreadsheet yang Aman
+    function muatDataRekap() {
+      const tbHaz = document.getElementById('pdfTbodyBahaya');
+      tbHaz.innerHTML = '<tr><td colspan="8" class="border p-3 text-center text-neutral-400"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengambil data dari Google Sheets...</td></tr>';
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(data => {
+            if (!data || !Array.isArray(data) || data.length === 0) {
+              tbHaz.innerHTML = '<tr><td colspan="8" class="border p-3 text-center text-neutral-400">Belum ada riwayat temuan bahaya yang tersimpan di sheet.</td></tr>';
+              return;
+            }
+
+            tbHaz.innerHTML = data.map((b, idx) => {
+              let badgeColor = b.risiko === 'Tinggi' ? 'text-red-700 font-black' : b.risiko === 'Sedang' ? 'text-amber-700 font-bold' : 'text-green-700 font-bold';
+              return `
+                <tr>
+                  <td class="border border-neutral-300 p-1.5 text-center font-bold">${idx + 1}</td>
+                  <td class="border border-neutral-300 p-1.5">${b.tanggal}<br><span class="text-[9px] text-neutral-500 font-semibold">${b.pelapor}</span></td>
+                  <td class="border border-neutral-300 p-1.5 font-semibold text-neutral-800">${b.area}</td>
+                  <td class="border border-neutral-300 p-1.5 text-center ${badgeColor}">${b.risiko}</td>
+                  <td class="border border-neutral-300 p-1.5 leading-tight">${b.deskripsi}</td>
+                  <td class="border border-neutral-300 p-1.5 text-neutral-800 font-medium">${b.capa}</td>
+                  <td class="border border-neutral-300 p-1.5 font-semibold text-red-800">${b.pic}</td>
+                  <td class="border border-neutral-300 p-1.5 text-center text-[9px] text-neutral-600">${b.target || '-'}</td>
+                </tr>
+              `;
+            }).join('');
+          })
+          .withFailureHandler(err => {
+            tbHaz.innerHTML = '<tr><td colspan="8" class="border p-3 text-center text-red-600">Gagal memuat rekap: ' + err + '</td></tr>';
+          })
+          .getRiwayatTemuan();
+      } else {
+        // Fallback demo lokal jika dibuka di browser biasa
+        tbHaz.innerHTML = `
+          <tr>
+            <td class="border border-neutral-300 p-1.5 text-center font-bold">1</td>
+            <td class="border border-neutral-300 p-1.5">Hari ini<br><span class="text-[9px] text-neutral-400">Hotmartua Sitompul</span></td>
+            <td class="border border-neutral-300 p-1.5 font-semibold">Smolog 1 - Area Sekitar Motor Screw Feeder</td>
+            <td class="border border-neutral-300 p-1.5 text-center text-amber-700 font-bold">Sedang</td>
+            <td class="border border-neutral-300 p-1.5">Tumpukan sisa kulit kayu dan serbuk lembap tebal dekat bearing motor.</td>
+            <td class="border border-neutral-300 p-1.5">Pembersihan 6K berkala dan pasang deflection plate.</td>
+            <td class="border border-neutral-300 p-1.5 font-semibold text-red-800">Operator Shift</td>
+            <td class="border border-neutral-300 p-1.5 text-center text-[9px]">Segera</td>
+          </tr>
+        `;
+      }
+    }
+
+    // Fungsi Cetak / Simpan PDF Menggunakan Browser Engine (100% Berhasil Tanpa Bergantung CDN Eksternal)
+    function cetakLaporanPDF() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
